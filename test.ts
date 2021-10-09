@@ -1,7 +1,7 @@
 import { test } from "uvu";
 import { equal } from "uvu/assert";
 
-import { multimethod } from "./index";
+import { multimethod } from "./index.js";
 
 test("peek first method", () => {
   const m = multimethod(
