@@ -4,6 +4,10 @@
   "description": "TypeScript multimethods inspired by Clojure multimethods",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:darky/ts-multimethod.git"
+  },
   "scripts": {
     "clean": "rimraf dist",
     "build": "npm run clean && tsc",
