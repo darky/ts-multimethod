@@ -1,0 +1,35 @@
+{
+  "name": "ts-multimethod",
+  "version": "0.1.0",
+  "description": "TypeScript multimethods inspired by Clojure multimethods",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "npm run clean && tsc",
+    "prepublishOnly": "npm run build",
+    "test": "node -r ts-node/register test.ts"
+  },
+  "files": [
+    "index.ts",
+    "dist/index.js",
+    "dist/index.js.map",
+    "dist/index.d.ts"
+  ],
+  "keywords": [
+    "clojure",
+    "multimethod",
+    "milti",
+    "method",
+    "typescript",
+    "ts"
+  ],
+  "author": "Vladislav Botvin",
+  "license": "MIT",
+  "devDependencies": {
+    "rimraf": "3.0.2",
+    "ts-node": "10.2.1",
+    "typescript": "4.4.3",
+    "uvu": "0.5.2"
+  }
+}
