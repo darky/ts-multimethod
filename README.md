@@ -320,3 +320,4 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 - Inspired by [Clojure's multimethods](https://clojure.org/reference/multimethods)
 - Built with TypeScript's advanced type system features
+- Version 0.3.0 was vibe coded by [Qwen Code](https://qwen.ai)
