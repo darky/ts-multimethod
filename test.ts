@@ -36,28 +36,6 @@ test("default method", () => {
   strictEqual(m(2), "default");
 });
 
-test("check 2 arity", () => {
-  const m = multimethod(
-    (n: number, s: string) => `${s}${n}`,
-    () => "default",
-    ["s1", () => "s1"],
-    ["s2", (n, s) => n + s],
-  );
-
-  strictEqual(m(2, "s"), "2s");
-});
-
-test("check 3 arity", () => {
-  const m = multimethod(
-    (_0: number, _1: string, b: boolean) => b,
-    () => "default",
-    [true, (n, s) => n + 1 + s],
-    [false, () => "wrong"],
-  );
-
-  strictEqual(m(2, "s", true), "3s");
-});
-
 test("class usage", () => {
   class Test {
     zero = "zero";

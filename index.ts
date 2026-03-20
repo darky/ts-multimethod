@@ -8,7 +8,6 @@ type ExtractCovered<T> = T extends readonly (infer Item)[]
     : never
   : never;
 
-// Check if P is a literal type (not a wide type like number, string, boolean)
 type IsLiteralType<P> = [P] extends [number]
   ? [number] extends [P]
     ? false
@@ -27,7 +26,6 @@ type IsLiteralType<P> = [P] extends [number]
           : true
         : true;
 
-// Only enforce exhaustive check for literal types
 type ExhaustiveConstraint<P, Cases> =
   IsLiteralType<P> extends true
     ? IsExhaustive<P, ExtractCovered<Cases>> extends true
@@ -36,23 +34,23 @@ type ExhaustiveConstraint<P, Cases> =
     : { length: number };
 
 export function multimethod<
+  A,
   P,
   R,
-  Args extends unknown[],
-  const Cases extends readonly (readonly [P, (...args: Args) => R])[],
+  const Cases extends readonly (readonly [P, (arg: P) => R])[],
 >(
-  predicateFn: (...args: Args) => P,
-  defaultFn: (...args: Args) => R,
+  predicateFn: (arg: A) => P,
+  defaultFn: (arg: P) => R,
   ...fns: Cases & {
     [K in keyof Cases]: Cases[K] extends readonly [infer C, any]
-      ? readonly [C, (...args: Args) => R]
+      ? readonly [C, (arg: C) => R]
       : never;
   } & ExhaustiveConstraint<P, Cases>
-): (...args: Args) => R {
-  const dict = Object.fromEntries(fns as unknown as [any, any][]);
+): (arg: A) => R {
+  const dict = Object.fromEntries(fns);
 
-  return (...args: Args) => {
-    const predicate = predicateFn(...args);
-    return (dict[predicate] ?? defaultFn)(...args);
+  return (arg: A) => {
+    const predicate = predicateFn(arg);
+    return (dict[predicate] ?? defaultFn)(predicate);
   };
 }
