@@ -123,4 +123,19 @@ test("exhaustive pattern matching - three cases incomplete error", () => {
   );
 });
 
+test("predicates types narrowing works", () => {
+  const m = multimethod(
+    (s: string) => s as "a" | "b" | "c",
+    () => "other",
+    ["a", (a) => a satisfies "a"],
+    ["b", (b) => b satisfies "b"],
+    ["c", (c) => c satisfies "c"],
+  );
+
+  strictEqual(m("a"), "A");
+  strictEqual(m("b"), "B");
+  strictEqual(m("c"), "C");
+  strictEqual(m("d"), "other");
+});
+
 test.run();
