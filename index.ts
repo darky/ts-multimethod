@@ -1,74 +1,58 @@
-export function multimethod<P, R>(
-  predicateFn: () => P,
-  defaultFn: () => R,
-  ...fns: [predicate: P, fn: () => R][]
-): () => R;
+type IsExhaustive<P, Covered> = [Exclude<P, Covered>] extends [never]
+  ? true
+  : false;
 
-export function multimethod<P, R, T1>(
-  predicateFn: (arg1: T1) => P,
-  defaultFn: (arg1: T1) => R,
-  ...fns: [predicate: P, fn: (arg1: T1) => R][]
-): (arg1: T1) => R;
+type ExtractCovered<T> = T extends readonly (infer Item)[]
+  ? Item extends readonly [infer P, any]
+    ? P
+    : never
+  : never;
 
-export function multimethod<P, R, T1, T2>(
-  predicateFn: (arg1: T1, arg2: T2) => P,
-  defaultFn: (arg1: T1, arg2: T2) => R,
-  ...fns: [predicate: P, fn: (arg1: T1, arg2: T2) => R][]
-): (arg1: T1, arg2: T2) => R;
+// Check if P is a literal type (not a wide type like number, string, boolean)
+type IsLiteralType<P> = [P] extends [number]
+  ? [number] extends [P]
+    ? false
+    : true
+  : [P] extends [string]
+    ? [string] extends [P]
+      ? false
+      : true
+    : [P] extends [boolean]
+      ? [boolean] extends [P]
+        ? false
+        : true
+      : [P] extends [symbol]
+        ? [symbol] extends [P]
+          ? false
+          : true
+        : true;
 
-export function multimethod<P, R, T1, T2, T3>(
-  predicateFn: (arg1: T1, arg2: T2, arg3: T3) => P,
-  defaultFn: (arg1: T1, arg2: T2, arg3: T3) => R,
-  ...fns: [predicate: P, fn: (arg1: T1, arg2: T2, arg3: T3) => R][]
-): (arg1: T1, arg2: T2, arg3: T3) => R;
+// Only enforce exhaustive check for literal types
+type ExhaustiveConstraint<P, Cases> =
+  IsLiteralType<P> extends true
+    ? IsExhaustive<P, ExtractCovered<Cases>> extends true
+      ? { length: number }
+      : { length: never }
+    : { length: number };
 
-export function multimethod<P, R, T1, T2, T3, T4>(
-  predicateFn: (arg1: T1, arg2: T2, arg3: T3, arg4: T4) => P,
-  defaultFn: (arg1: T1, arg2: T2, arg3: T3, arg4: T4) => R,
-  ...fns: [predicate: P, fn: (arg1: T1, arg2: T2, arg3: T3, arg4: T4) => R][]
-): (arg1: T1, arg2: T2, arg3: T3, arg4: T4) => R;
+export function multimethod<
+  P,
+  R,
+  Args extends unknown[],
+  const Cases extends readonly (readonly [P, (...args: Args) => R])[],
+>(
+  predicateFn: (...args: Args) => P,
+  defaultFn: (...args: Args) => R,
+  ...fns: Cases & {
+    [K in keyof Cases]: Cases[K] extends readonly [infer C, any]
+      ? readonly [C, (...args: Args) => R]
+      : never;
+  } & ExhaustiveConstraint<P, Cases>
+): (...args: Args) => R {
+  const dict = Object.fromEntries(fns as unknown as [any, any][]);
 
-export function multimethod<P, R, T1, T2, T3, T4, T5>(
-  predicateFn: (arg1: T1, arg2: T2, arg3: T3, arg4: T4, arg5: T5) => P,
-  defaultFn: (arg1: T1, arg2: T2, arg3: T3, arg4: T4, arg5: T5) => R,
-  ...fns: [predicate: P, fn: (arg1: T1, arg2: T2, arg3: T3, arg4: T4, arg5: T5) => R][]
-): (arg1: T1, arg2: T2, arg3: T3, arg4: T4, arg5: T5) => R;
-
-export function multimethod<P, R, T1, T2, T3, T4, T5, T6>(
-  predicateFn: (arg1: T1, arg2: T2, arg3: T3, arg4: T4, arg5: T5, arg6: T6) => P,
-  defaultFn: (arg1: T1, arg2: T2, arg3: T3, arg4: T4, arg5: T5, arg6: T6) => R,
-  ...fns: [predicate: P, fn: (arg1: T1, arg2: T2, arg3: T3, arg4: T4, arg5: T5, arg6: T6) => R][]
-): (arg1: T1, arg2: T2, arg3: T3, arg4: T4, arg5: T5, arg6: T6) => R;
-
-export function multimethod<P, R, T1, T2, T3, T4, T5, T6, T7>(
-  predicateFn: (arg1: T1, arg2: T2, arg3: T3, arg4: T4, arg5: T5, arg6: T6, arg7: T7) => P,
-  defaultFn: (arg1: T1, arg2: T2, arg3: T3, arg4: T4, arg5: T5, arg6: T6, arg7: T7) => R,
-  ...fns: [predicate: P, fn: (arg1: T1, arg2: T2, arg3: T3, arg4: T4, arg5: T5, arg6: T6, arg7: T7) => R][]
-): (arg1: T1, arg2: T2, arg3: T3, arg4: T4, arg5: T5, arg6: T6, arg7: T7) => R;
-
-export function multimethod<P, R, T1, T2, T3, T4, T5, T6, T7, T8>(
-  predicateFn: (arg1: T1, arg2: T2, arg3: T3, arg4: T4, arg5: T5, arg6: T6, arg7: T7, arg8: T8) => P,
-  defaultFn: (arg1: T1, arg2: T2, arg3: T3, arg4: T4, arg5: T5, arg6: T6, arg7: T7, arg8: T8) => R,
-  ...fns: [predicate: P, fn: (arg1: T1, arg2: T2, arg3: T3, arg4: T4, arg5: T5, arg6: T6, arg7: T7, arg8: T8) => R][]
-): (arg1: T1, arg2: T2, arg3: T3, arg4: T4, arg5: T5, arg6: T6, arg7: T7, arg8: T8) => R;
-
-export function multimethod<P, R, T1, T2, T3, T4, T5, T6, T7, T8, T9>(
-  predicateFn: (arg1: T1, arg2: T2, arg3: T3, arg4: T4, arg5: T5, arg6: T6, arg7: T7, arg8: T8, arg9: T9) => P,
-  defaultFn: (arg1: T1, arg2: T2, arg3: T3, arg4: T4, arg5: T5, arg6: T6, arg7: T7, arg8: T8, arg9: T9) => R,
-  ...fns: [predicate: P, fn: (arg1: T1, arg2: T2, arg3: T3, arg4: T4, arg5: T5, arg6: T6, arg7: T7, arg8: T8, arg9: T9) => R][]
-): (arg1: T1, arg2: T2, arg3: T3, arg4: T4, arg5: T5, arg6: T6, arg7: T7, arg8: T8, arg9: T9) => R;
-
-export function multimethod<P, R, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>(
-  predicateFn: (arg1: T1, arg2: T2, arg3: T3, arg4: T4, arg5: T5, arg6: T6, arg7: T7, arg8: T8, arg9: T9, arg10: T10) => P,
-  defaultFn: (arg1: T1, arg2: T2, arg3: T3, arg4: T4, arg5: T5, arg6: T6, arg7: T7, arg8: T8, arg9: T9, arg10: T10) => R,
-  ...fns: [predicate: P, fn: (arg1: T1, arg2: T2, arg3: T3, arg4: T4, arg5: T5, arg6: T6, arg7: T7, arg8: T8, arg9: T9, arg10: T10) => R][]
-): (arg1: T1, arg2: T2, arg3: T3, arg4: T4, arg5: T5, arg6: T6, arg7: T7, arg8: T8, arg9: T9, arg10: T10) => R;
-
-export function multimethod(predicateFn: Function, defaultFn: Function, ...fns: [predicate: unknown, fn: Function][]) {
-  const dict = Object.fromEntries(fns);
-
-  return (...args: unknown[]) => {
+  return (...args: Args) => {
     const predicate = predicateFn(...args);
     return (dict[predicate] ?? defaultFn)(...args);
   };
-};
+}
